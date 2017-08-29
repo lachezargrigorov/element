@@ -63,11 +63,36 @@
     methods: {
       getCellStyle(month) {
         const style = {};
-        const date = new Date(this.date);
 
+        var year = this.date.getFullYear();
+        var date = new Date(0);
+        date.setFullYear(year);
         date.setMonth(month);
-        style.disabled = typeof this.disabledDate === 'function' &&
-          this.disabledDate(date);
+        date.setHours(0);
+        var nextMonth = new Date(date);
+        nextMonth.setMonth(month + 1);
+
+        var flag = false;
+        if (typeof this.disabledDate === 'function') {
+
+          while (date < nextMonth) {
+            if (this.disabledDate(date)) {
+              date = new Date(date.getTime() + 8.64e7);
+            } else {
+              break;
+            }
+          }
+          // There is a bug of Chrome.
+          // For example:
+          // var date = new Date('1988-04-01 00:00:00') Fri Apr 01 1988 00:00:00 GMT+0800 (CST)
+          // date.setMonth(4) Sun May 01 1988 00:00:00 GMT+0900 (CDT)
+          // Sometimes the time zone will change.
+          if (date - nextMonth < 8.64e7) {
+            flag = true;
+          }
+        }
+
+        style.disabled = flag;
         style.current = this.month === month;
 
         return style;
