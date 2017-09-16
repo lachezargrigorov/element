@@ -3,18 +3,18 @@
     class="el-radio-button"
     :class="[
       size ? 'el-radio-button--' + size : '',
-      { 'is-active': value === label },
+      { 'is-active': model == value },
       { 'is-disabled': isDisabled }
     ]"
   >
     <input
       class="el-radio-button__orig-radio"
-      :value="label"
+      :value="value"
       type="radio"
-      v-model="value"
+      v-model="model"
       :name="name"
       :disabled="isDisabled">
-    <span class="el-radio-button__inner" :style="value === label ? activeStyle : null">
+    <span class="el-radio-button__inner" :style="model == value ? activeStyle : null">
       <slot></slot>
       <template v-if="!$slots.default">{{label}}</template>
     </span>
@@ -25,12 +25,13 @@
     name: 'ElRadioButton',
 
     props: {
+      value: {},
       label: {},
       disabled: Boolean,
       name: String
     },
     computed: {
-      value: {
+        model: {
         get() {
           return this._radioGroup.value;
         },
